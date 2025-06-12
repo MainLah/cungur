@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import handleLogout from "../utils/handleLogout";
 
 export type Message = {
   username: string | null;
@@ -15,7 +16,7 @@ const DashboardPage = () => {
   const [newMessage, setNewMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
-  const [userLink, setUserLink] = useState("");
+  const [userLink, setUserLink] = useState<string>("");
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -27,8 +28,8 @@ const DashboardPage = () => {
         });
         if (res.ok) {
           const data = await res.json();
-          setUsername(data.username);
-          setUserLink(`http://localhost:3000/dashboard/${data.username}`);
+          setUsername(data.data.username);
+          setUserLink(`http://localhost:5173/dashboard/${data.data.username}`);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
@@ -87,8 +88,11 @@ const DashboardPage = () => {
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
       <Card>
-        <CardHeader>
+        <CardHeader className="flex items-center justify-between">
           <CardTitle>Dashboard</CardTitle>
+          <Button size="lg" onClick={handleLogout}>
+            Logout
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="mb-6">

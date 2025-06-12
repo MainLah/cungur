@@ -4,9 +4,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Message } from "./dashboard";
 import { useParams } from "react-router-dom";
+import handleLogout from "../utils/handleLogout";
 
 const OtherUsersPage = () => {
-  const { username } = useParams<{ username: string}>();
+  const { username } = useParams<{ username: string }>();
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
 
@@ -31,7 +32,11 @@ const OtherUsersPage = () => {
   const handleSend = async () => {
     if (newMessage.trim()) {
       setCurrentMessages([
-        { username: username ?? null, message: newMessage, timestamp: new Date() },
+        {
+          username: username ?? null,
+          message: newMessage,
+          timestamp: new Date(),
+        },
         ...currentMessages,
       ]);
       try {
@@ -54,8 +59,11 @@ const OtherUsersPage = () => {
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
       <Card>
-        <CardHeader>
+        <CardHeader className="flex items-center justify-between">
           <CardTitle>Dashboard</CardTitle>
+          <Button size="lg" onClick={handleLogout}>
+            Logout
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
