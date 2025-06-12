@@ -15,7 +15,7 @@ const DashboardPage = () => {
   const [newMessage, setNewMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
-  const [userLink, setUserLink] = useState("");
+  const [userLink, setUserLink] = useState<string>("");
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -27,8 +27,8 @@ const DashboardPage = () => {
         });
         if (res.ok) {
           const data = await res.json();
-          setUsername(data.username);
-          setUserLink(`http://localhost:3000/dashboard/${data.username}`);
+          setUsername(data.data.username);
+          setUserLink(`http://localhost:3000/dashboard/${data.data.username}`);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
