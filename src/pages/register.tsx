@@ -13,12 +13,13 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [error, setError] = useState<string | null>(null);
   const form = useForm({
     defaultValues: {
       username: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
@@ -39,12 +40,17 @@ const LoginPage = () => {
   //     });
   // });
   const handleSubmit = form.handleSubmit((data) => {
-    fetch("http://localhost:3000/api/auth/login", {
+    if (data.password !== data.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    fetch("http://localhost:3000/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: data.username,
         password: data.password,
+        confirmPassword: data.confirmPassword,
       }),
       credentials: "include",
     })
@@ -57,7 +63,6 @@ const LoginPage = () => {
       })
       .catch((e) => {
         console.error(e, "error");
-        setError("Invalid username or password");
       });
   });
 
@@ -68,7 +73,7 @@ const LoginPage = () => {
       ) : null}
       <Card>
         <CardHeader>
-          <CardTitle>Login into your account</CardTitle>
+          <CardTitle>Register</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -104,10 +109,26 @@ const LoginPage = () => {
                   </FormItem>
                 )}
               />
+              <FormField
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Confirm Password"
+                        type="password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <div>
-                <Button type="submit">Login</Button>
+                <Button type="submit">Register</Button>
                 <Button variant="link" asChild>
-                  <Link to="/register">Register</Link>
+                  <Link to="/">Back</Link>
                 </Button>
               </div>
             </form>
@@ -118,4 +139,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
