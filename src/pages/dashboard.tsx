@@ -14,8 +14,8 @@ const DashboardPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [copied, setCopied] = useState(false);
-  const [username, setUsername] = useState<string | null>("");
-  const userLink = "localhost dulu yagesya";
+  const [username, setUsername] = useState<string | null>(null);
+  const [userLink, setUserLink] = useState("");
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -28,6 +28,7 @@ const DashboardPage = () => {
         if (res.ok) {
           const data = await res.json();
           setUsername(data.username);
+          setUserLink(`http://localhost:3000/dashboard/${data.username}`);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
@@ -93,7 +94,9 @@ const DashboardPage = () => {
           <div className="mb-6">
             <div className="font-medium mb-2">Your cungur link:</div>
             <div className="flex items-center gap-2">
-              <Input value={userLink} readOnly className="flex-1" />
+              {username && (
+                <Input value={userLink} readOnly className="flex-1" />
+              )}
               <Button size="sm" variant="outline" onClick={handleCopy}>
                 {copied ? "Copied!" : "Copy"}
               </Button>
