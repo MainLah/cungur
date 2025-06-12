@@ -12,7 +12,7 @@ import {
 } from "react-router-dom";
 
 const routerGuard = async () => {
-  const res = await fetch("http://localhost:3000/api/auth/me", {
+  const res = await fetch("https://cungur-v2.vercel.app/api/auth/me", {
     credentials: "include",
   });
 
