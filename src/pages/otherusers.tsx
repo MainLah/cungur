@@ -15,7 +15,7 @@ const OtherUsersPage = () => {
     const fetchData = async () => {
       try {
         const DBCurrentMessages = await fetch(
-          `http://localhost:3000/api/messages/${username}`,
+          `https://cungur-v2.vercel.app/api/messages/${username}`,
           { credentials: "include" }
         );
         if (DBCurrentMessages.ok) {
@@ -40,7 +40,7 @@ const OtherUsersPage = () => {
         ...currentMessages,
       ]);
       try {
-        await fetch(`http://localhost:3000/api/create/${username}`, {
+        await fetch(`https://cungur-v2.vercel.app/api/create/${username}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
