@@ -22,24 +22,8 @@ const LoginPage = () => {
     },
   });
 
-  // const handleSubmit = form.handleSubmit((data) => {
-  //   console.log(data);
-  //   fetch("https://cungur-v2.vercel.app/api/auth/login", {
-  //     method: "POST",
-  //     body: JSON.stringify({
-  //       username: data.username,
-  //       password: data.password,
-  //     }),
-  //   })
-  //     .then((e) => {
-  //       console.log(e);
-  //     })
-  //     .catch((e) => {
-  //       console.error(e);
-  //     });
-  // });
   const handleSubmit = form.handleSubmit((data) => {
-    fetch("http://localhost:3000/api/auth/login", {
+    fetch("https://cungur-v2.vercel.app/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -21,7 +21,7 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/auth/me", {
+        const res = await fetch("https://cungur-v2.vercel.app/api/auth/me", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -29,7 +29,9 @@ const DashboardPage = () => {
         if (res.ok) {
           const data = await res.json();
           setUsername(data.data.username);
-          setUserLink(`http://localhost:5173/dashboard/${data.data.username}`);
+          setUserLink(
+            `https://cungur-v2.vercel.app/dashboard/${data.data.username}`
+          );
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
@@ -42,7 +44,7 @@ const DashboardPage = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetch("http://localhost:3000/api/messages", {
+        const data = await fetch("https://cungur-v2.vercel.app/api/messages", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -69,7 +71,7 @@ const DashboardPage = () => {
         ...messages,
       ]);
       try {
-        await fetch("http://localhost:3000/api/create", {
+        await fetch("https://cungur-v2.vercel.app/api/create", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
