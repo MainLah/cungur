@@ -29,7 +29,7 @@ const DashboardPage = () => {
         if (res.ok) {
           const data = await res.json();
           setUsername(data.data.username);
-          setUserLink(`${BASE_URL}/dashboard/${data.data.username}`);
+          setUserLink(`https://cungur.vercel.app/dashboard/${data.data.username}`);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
