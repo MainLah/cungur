@@ -12,10 +12,11 @@ export type Message = {
 };
 
 const DashboardPage = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMessage, setIsLoadingMessages] = useState(true);
+  const [isLoadingLink, setIsLoadingLink] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [copied, setCopied] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
+  const [_, setUsername] = useState<string | null>(null);
   const [userLink, setUserLink] = useState<string>("");
 
   useEffect(() => {
@@ -29,7 +30,10 @@ const DashboardPage = () => {
         if (res.ok) {
           const data = await res.json();
           setUsername(data.data.username);
-          setUserLink(`https://cungur.vercel.app/dashboard/${data.data.username}`);
+          setUserLink(
+            `https://cungur.vercel.app/dashboard/${data.data.username}`
+          );
+          setIsLoadingLink(false);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
@@ -47,7 +51,7 @@ const DashboardPage = () => {
         });
         const messages = await data.json();
         setMessages(messages.data);
-        setIsLoading(false);
+        setIsLoadingMessages(false);
       } catch (error) {
         console.error(error);
       }
@@ -74,7 +78,9 @@ const DashboardPage = () => {
           <div className="mb-6">
             <div className="font-medium mb-2">Step 1. Copy this link:</div>
             <div className="flex items-center gap-2 mb-2">
-              {username && (
+              {isLoadingLink ? (
+                <div className="text-gray-500">Generating link...</div>
+              ) : (
                 <Input value={userLink} readOnly className="flex-1" />
               )}
               <Button size="sm" variant="outline" onClick={handleCopy}>
@@ -88,7 +94,7 @@ const DashboardPage = () => {
           <div>
             <div className="font-medium mb-2">Received Messages:</div>
             <div className="space-y-3">
-              {isLoading ? (
+              {isLoadingMessage ? (
                 <div className="text-gray-500">Loading messages...</div>
               ) : messages.length === 0 ? (
                 <div className="text-gray-500">No messages yet.</div>
