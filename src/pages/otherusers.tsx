@@ -9,6 +9,7 @@ import { BASE_URL } from "../utils/env";
 
 const OtherUsersPage = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
   const { username } = useParams<{ username: string }>();
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -23,11 +24,12 @@ const OtherUsersPage = () => {
         if (DBCurrentMessages.status === 403) {
           const errorData = await DBCurrentMessages.json();
           console.error("Error fetching messages:", errorData.message);
-          navigate("/");
+          navigate("/dashboard");
         }
         if (DBCurrentMessages.ok) {
           const data = await DBCurrentMessages.json();
           setCurrentMessages(data.data);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -95,7 +97,9 @@ const OtherUsersPage = () => {
           <div>
             <div className="font-medium mb-2">Received Messages:</div>
             <div className="space-y-3">
-              {currentMessages.length === 0 ? (
+              {isLoading ? (
+                <div className="text-gray-500">Loading messages...</div>
+              ) : currentMessages.length === 0 ? (
                 <div className="text-gray-500">No messages yet.</div>
               ) : (
                 currentMessages.map((msg, index) => (

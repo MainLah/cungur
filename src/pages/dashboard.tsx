@@ -12,6 +12,7 @@ export type Message = {
 };
 
 const DashboardPage = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [copied, setCopied] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
@@ -46,6 +47,7 @@ const DashboardPage = () => {
         });
         const messages = await data.json();
         setMessages(messages.data);
+        setIsLoading(false);
       } catch (error) {
         console.error(error);
       }
@@ -86,7 +88,9 @@ const DashboardPage = () => {
           <div>
             <div className="font-medium mb-2">Received Messages:</div>
             <div className="space-y-3">
-              {messages.length === 0 ? (
+              {isLoading ? (
+                <div className="text-gray-500">Loading messages...</div>
+              ) : messages.length === 0 ? (
                 <div className="text-gray-500">No messages yet.</div>
               ) : (
                 messages.map((msg, index) => (
