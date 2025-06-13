@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import handleLogout from "../utils/handleLogout";
+import { BASE_URL } from "../utils/env";
 
 export type Message = {
   username: string | null;
@@ -13,7 +13,6 @@ export type Message = {
 
 const DashboardPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
   const [userLink, setUserLink] = useState<string>("");
@@ -21,7 +20,7 @@ const DashboardPage = () => {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const res = await fetch("https://cungur-v2.vercel.app/api/auth/me", {
+        const res = await fetch(BASE_URL + "/api/auth/me", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -29,9 +28,7 @@ const DashboardPage = () => {
         if (res.ok) {
           const data = await res.json();
           setUsername(data.data.username);
-          setUserLink(
-            `https://cungur-v2.vercel.app/dashboard/${data.data.username}`
-          );
+          setUserLink(`${BASE_URL}/dashboard/${data.data.username}`);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
@@ -39,12 +36,10 @@ const DashboardPage = () => {
       }
     };
     fetchUsername();
-  }, []);
 
-  useEffect(() => {
     const getData = async () => {
       try {
-        const data = await fetch("https://cungur-v2.vercel.app/api/messages", {
+        const data = await fetch(BASE_URL + "/api/messages", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -56,7 +51,7 @@ const DashboardPage = () => {
       }
     };
     getData();
-  }, []);
+  }, [BASE_URL]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(userLink);
@@ -64,42 +59,19 @@ const DashboardPage = () => {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const handleSend = async () => {
-    if (newMessage.trim()) {
-      setMessages([
-        { username: username, message: newMessage, timestamp: new Date() },
-        ...messages,
-      ]);
-      try {
-        await fetch("https://cungur-v2.vercel.app/api/create", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: username,
-            message: newMessage,
-          }),
-          credentials: "include",
-        });
-      } catch (error) {
-        console.error("Failed to send message:", error);
-      }
-      setNewMessage("");
-    }
-  };
-
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
       <Card>
         <CardHeader className="flex items-center justify-between">
-          <CardTitle>Dashboard</CardTitle>
+          <CardTitle>Your Inbox</CardTitle>
           <Button size="lg" onClick={handleLogout}>
             Logout
           </Button>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-            <div className="font-medium mb-2">Your cungur link:</div>
-            <div className="flex items-center gap-2">
+            <div className="font-medium mb-2">Step 1. Copy this link:</div>
+            <div className="flex items-center gap-2 mb-2">
               {username && (
                 <Input value={userLink} readOnly className="flex-1" />
               )}
@@ -107,19 +79,8 @@ const DashboardPage = () => {
                 {copied ? "Copied!" : "Copy"}
               </Button>
             </div>
-          </div>
-          <div className="mb-6">
             <div className="font-medium mb-2">
-              Send yourself an anonymous message:
-            </div>
-            <div className="flex gap-2">
-              <Textarea
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1"
-              />
-              <Button onClick={handleSend}>Send</Button>
+              Step 2. Share it with your friends to start receiving messages!
             </div>
           </div>
           <div>

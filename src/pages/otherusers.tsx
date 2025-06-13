@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Message } from "./dashboard";
-import { useParams } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import handleLogout from "../utils/handleLogout";
+import { BASE_URL } from "../utils/env";
 
 const OtherUsersPage = () => {
+  const navigate = useNavigate();
   const { username } = useParams<{ username: string }>();
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -15,9 +17,14 @@ const OtherUsersPage = () => {
     const fetchData = async () => {
       try {
         const DBCurrentMessages = await fetch(
-          `https://cungur-v2.vercel.app/api/messages/${username}`,
+          `${BASE_URL}/api/messages/${username}`,
           { credentials: "include" }
         );
+        if (DBCurrentMessages.status === 403) {
+          const errorData = await DBCurrentMessages.json();
+          console.error("Error fetching messages:", errorData.message);
+          navigate("/");
+        }
         if (DBCurrentMessages.ok) {
           const data = await DBCurrentMessages.json();
           setCurrentMessages(data.data);
@@ -27,7 +34,7 @@ const OtherUsersPage = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [navigate, BASE_URL, username]);
 
   const handleSend = async () => {
     if (newMessage.trim()) {
@@ -40,7 +47,7 @@ const OtherUsersPage = () => {
         ...currentMessages,
       ]);
       try {
-        await fetch(`https://cungur-v2.vercel.app/api/create/${username}`, {
+        await fetch(`${BASE_URL}/api/create/${username}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -61,9 +68,14 @@ const OtherUsersPage = () => {
       <Card>
         <CardHeader className="flex items-center justify-between">
           <CardTitle>Dashboard</CardTitle>
-          <Button size="lg" onClick={handleLogout}>
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button size="default" variant="link" asChild>
+              <Link to="/dashboard">Your Inbox</Link>
+            </Button>
+            <Button size="lg" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="mb-6">

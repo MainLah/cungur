@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { BASE_URL } from "../utils/env";
 
 const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +24,7 @@ const LoginPage = () => {
   });
 
   const handleSubmit = form.handleSubmit((data) => {
-    fetch("https://cungur-v2.vercel.app/api/auth/login", {
+    fetch(BASE_URL + "/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

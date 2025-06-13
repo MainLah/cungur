@@ -10,9 +10,10 @@ import {
   RouterProvider,
   redirect,
 } from "react-router-dom";
+import { BASE_URL } from "./utils/env";
 
 const routerGuard = async () => {
-  const res = await fetch("https://cungur-v2.vercel.app/api/auth/me", {
+  const res = await fetch(BASE_URL + "/api/auth/me", {
     credentials: "include",
   });
 
