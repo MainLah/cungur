@@ -40,16 +40,8 @@ const OtherUsersPage = () => {
 
   const handleSend = async () => {
     if (newMessage.trim()) {
-      setCurrentMessages([
-        {
-          username: username ?? null,
-          message: newMessage,
-          timestamp: new Date(),
-        },
-        ...currentMessages,
-      ]);
       try {
-        await fetch(`${BASE_URL}/api/create/${username}`, {
+        const res = await fetch(`${BASE_URL}/api/create/${username}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -58,6 +50,17 @@ const OtherUsersPage = () => {
           }),
           credentials: "include",
         });
+        if (res.ok) {
+          setCurrentMessages([
+            {
+              _id: await res.json().then((data) => data._id),
+              username: username ?? null,
+              message: newMessage,
+              timestamp: new Date(),
+            },
+            ...currentMessages,
+          ]);
+        }
       } catch (error) {
         console.error("Failed to send message:", error);
       }
@@ -105,6 +108,7 @@ const OtherUsersPage = () => {
                 currentMessages.map((msg, index) => (
                   <div
                     key={index}
+                    data-id={msg._id}
                     className="bg-gray-100 rounded p-3 text-gray-800"
                   >
                     {msg.message}

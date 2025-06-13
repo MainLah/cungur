@@ -6,17 +6,18 @@ import handleLogout from "../utils/handleLogout";
 import { BASE_URL } from "../utils/env";
 
 export type Message = {
+  _id: string;
   username: string | null;
   message: string;
   timestamp: Date;
 };
 
 const DashboardPage = () => {
+  const [error, setError] = useState<string | null>(null);
   const [isLoadingMessage, setIsLoadingMessages] = useState(true);
   const [isLoadingLink, setIsLoadingLink] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [copied, setCopied] = useState(false);
-  const [_, setUsername] = useState<string | null>(null);
   const [userLink, setUserLink] = useState<string>("");
 
   useEffect(() => {
@@ -29,7 +30,6 @@ const DashboardPage = () => {
         });
         if (res.ok) {
           const data = await res.json();
-          setUsername(data.data.username);
           setUserLink(
             `https://cungur.vercel.app/dashboard/${data.data.username}`
           );
@@ -37,7 +37,6 @@ const DashboardPage = () => {
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
-        setUsername("");
       }
     };
     fetchUsername();
@@ -51,9 +50,10 @@ const DashboardPage = () => {
         });
         const messages = await data.json();
         setMessages(messages.data);
+        console.log(messages);
         setIsLoadingMessages(false);
       } catch (error) {
-        console.error(error);
+        setError(error as unknown as string);
       }
     };
     getData();
@@ -65,8 +65,28 @@ const DashboardPage = () => {
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/delete/`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ _id: id }),
+      });
+      console.log(id);
+      if (res.ok) {
+        setMessages(messages.filter((msg) => msg._id !== id));
+      }
+    } catch (error) {
+      setError(error as unknown as string);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
+      {error ? (
+        <div className="text-red-500 text-center mb-4 text-2xl">{error}</div>
+      ) : null}
       <Card>
         <CardHeader className="flex items-center justify-between">
           <CardTitle>Your Inbox</CardTitle>
@@ -100,11 +120,16 @@ const DashboardPage = () => {
                 <div className="text-gray-500">No messages yet.</div>
               ) : (
                 messages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-100 rounded p-3 text-gray-800"
-                  >
-                    {msg.message}
+                  <div key={index}>
+                    <div className="bg-gray-100 rounded p-3 text-gray-800 relative group cursor-default">
+                      {msg.message}
+                      <img
+                        className="w-4 absolute top-4 right-2 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+                        src="./delete-svgrepo-com.svg"
+                        alt="Delete Message"
+                        onClick={() => handleDelete(msg._id)}
+                      />
+                    </div>
                   </div>
                 ))
               )}
