@@ -47,11 +47,19 @@ const LoginPage = () => {
   });
 
   return (
-    <div className="items-center h-screen max-w-2xl mx-auto py-10 px-4">
+    <div className="flex flex-col justify-center h-screen max-w-2xl mx-auto py-10 px-4">
       {error ? (
         <div className="text-red-500 text-center mb-4 text-2xl">{error}</div>
       ) : null}
-      <Card>
+      <div>
+        <h1 className="text-3xl font-bold text-center mb-2">
+          Welcome to Cungur App,
+        </h1>
+        <p className="text-center mb-12">
+          Send anonymous message to your friend!
+        </p>
+      </div>
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Login into your account</CardTitle>
         </CardHeader>

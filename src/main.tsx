@@ -31,6 +31,10 @@ const checkIfParamIsTheCurrentUser = async ({ params }: LoaderFunctionArgs) => {
     credentials: "include",
   });
 
+  if (!res.ok) {
+    throw redirect("/");
+  }
+
   const data = await res.json();
 
   if (data.data.username === username) {
