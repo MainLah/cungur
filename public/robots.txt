@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cungur.vercel.app/sitemap.xml
