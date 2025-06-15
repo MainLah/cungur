@@ -3,10 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Message } from "./dashboard";
-import { useParams } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import handleLogout from "../utils/handleLogout";
+import { BASE_URL } from "../utils/env";
 
 const OtherUsersPage = () => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
   const { username } = useParams<{ username: string }>();
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -15,32 +18,30 @@ const OtherUsersPage = () => {
     const fetchData = async () => {
       try {
         const DBCurrentMessages = await fetch(
-          `https://cungur-v2.vercel.app/api/messages/${username}`,
+          `${BASE_URL}/api/messages/${username}`,
           { credentials: "include" }
         );
+        if (DBCurrentMessages.status === 403) {
+          const errorData = await DBCurrentMessages.json();
+          console.error("Error fetching messages:", errorData.message);
+          navigate("/dashboard");
+        }
         if (DBCurrentMessages.ok) {
           const data = await DBCurrentMessages.json();
           setCurrentMessages(data.data);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
     };
     fetchData();
-  }, []);
+  }, [navigate, BASE_URL, username]);
 
   const handleSend = async () => {
     if (newMessage.trim()) {
-      setCurrentMessages([
-        {
-          username: username ?? null,
-          message: newMessage,
-          timestamp: new Date(),
-        },
-        ...currentMessages,
-      ]);
       try {
-        await fetch(`https://cungur-v2.vercel.app/api/create/${username}`, {
+        const res = await fetch(`${BASE_URL}/api/create/${username}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -49,6 +50,17 @@ const OtherUsersPage = () => {
           }),
           credentials: "include",
         });
+        if (res.ok) {
+          setCurrentMessages([
+            {
+              _id: await res.json().then((data) => data._id),
+              username: username ?? null,
+              message: newMessage,
+              timestamp: new Date(),
+            },
+            ...currentMessages,
+          ]);
+        }
       } catch (error) {
         console.error("Failed to send message:", error);
       }
@@ -61,9 +73,14 @@ const OtherUsersPage = () => {
       <Card>
         <CardHeader className="flex items-center justify-between">
           <CardTitle>Dashboard</CardTitle>
-          <Button size="lg" onClick={handleLogout}>
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button size="default" variant="link" asChild>
+              <Link to="/dashboard">Your Inbox</Link>
+            </Button>
+            <Button size="lg" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
@@ -83,12 +100,15 @@ const OtherUsersPage = () => {
           <div>
             <div className="font-medium mb-2">Received Messages:</div>
             <div className="space-y-3">
-              {currentMessages.length === 0 ? (
+              {isLoading ? (
+                <div className="text-gray-500">Loading messages...</div>
+              ) : currentMessages.length === 0 ? (
                 <div className="text-gray-500">No messages yet.</div>
               ) : (
                 currentMessages.map((msg, index) => (
                   <div
                     key={index}
+                    data-id={msg._id}
                     className="bg-gray-100 rounded p-3 text-gray-800"
                   >
                     {msg.message}

@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { BASE_URL } from "../utils/env";
 
 const RegisterPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,7 @@ const RegisterPage = () => {
   });
 
   const handleSubmit = form.handleSubmit((data) => {
-    fetch("https://cungur-v2.vercel.app/api/auth/register", {
+    fetch(BASE_URL + "/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -45,39 +46,21 @@ const RegisterPage = () => {
         console.error(e);
       });
   });
-  //   const handleSubmit = form.handleSubmit((data) => {
-  //     if (data.password !== data.confirmPassword) {
-  //       setError("Passwords do not match");
-  //       return;
-  //     }
-  //     fetch("http://localhost:3000/api/auth/register", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         username: data.username,
-  //         password: data.password,
-  //         confirmPassword: data.confirmPassword,
-  //       }),
-  //       credentials: "include",
-  //     })
-  //       .then(async (res) => {
-  //         if (res.status === 403) {
-  //           setError(await res.json().then((e) => e.message));
-  //           return;
-  //         }
-  //         window.location.href = "/dashboard";
-  //       })
-  //       .catch((e) => {
-  //         console.error(e, "error");
-  //       });
-  //   });
 
   return (
-    <div className="items-center h-screen max-w-2xl mx-auto py-10 px-4">
+    <div className="flex flex-col flex-auto justify-center h-screen max-w-2xl mx-auto py-10 px-4">
       {error ? (
         <div className="text-red-500 text-center mb-4 text-2xl">{error}</div>
       ) : null}
-      <Card>
+      <div>
+        <h1 className="text-3xl font-bold text-center mb-2">
+          Welcome to Cungur App,
+        </h1>
+        <p className="text-center mb-12">
+          Send anonymous message to your friend!
+        </p>
+      </div>
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Register</CardTitle>
         </CardHeader>

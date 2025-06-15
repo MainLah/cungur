@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { BASE_URL } from "../utils/env";
 
 const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +24,7 @@ const LoginPage = () => {
   });
 
   const handleSubmit = form.handleSubmit((data) => {
-    fetch("https://cungur-v2.vercel.app/api/auth/login", {
+    fetch(BASE_URL + "/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -46,11 +47,19 @@ const LoginPage = () => {
   });
 
   return (
-    <div className="items-center h-screen max-w-2xl mx-auto py-10 px-4">
+    <div className="flex flex-col justify-center h-screen max-w-2xl mx-auto py-10 px-4">
       {error ? (
         <div className="text-red-500 text-center mb-4 text-2xl">{error}</div>
       ) : null}
-      <Card>
+      <div>
+        <h1 className="text-3xl font-bold text-center mb-2">
+          Welcome to Cungur App,
+        </h1>
+        <p className="text-center mb-12">
+          Send anonymous message to your friend!
+        </p>
+      </div>
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Login into your account</CardTitle>
         </CardHeader>
