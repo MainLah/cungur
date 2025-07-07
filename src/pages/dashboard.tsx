@@ -22,34 +22,34 @@ const DashboardPage = () => {
 
   useEffect(() => {
     async function datas() {
-      const [fetchUsername, fetchData] = await Promise.all([
-        fetch(BASE_URL + "/api/auth/me", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        }),
-        fetch(BASE_URL + "/api/messages", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        }),
-      ]);
+      try {
+        const [fetchUsername, fetchData] = await Promise.all([
+          fetch(BASE_URL + "/api/auth/me", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }),
+          fetch(BASE_URL + "/api/messages", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }),
+        ]);
 
-      const username = await fetchUsername.json();
-      setUserLink(
-        `https://cungur.vercel.app/dashboard/${username.data.username}`
-      );
-      setIsLoadingLink(false);
+        const username = await fetchUsername.json();
+        setUserLink(
+          `https://cungur.vercel.app/dashboard/${username.data.username}`
+        );
+        setIsLoadingLink(false);
 
-      const data = await fetchData.json();
-      setMessages(data.data);
-      setIsLoadingMessages(false);
+        const data = await fetchData.json();
+        setMessages(data.data);
+        setIsLoadingMessages(false);
+      } catch (err) {
+        setError((err as unknown as Error).message);
+      }
     }
-    try {
-      datas();
-    } catch (e) {
-      setError((e as unknown as Error).message);
-    }
+    datas();
   }, [BASE_URL]);
 
   const handleCopy = () => {
