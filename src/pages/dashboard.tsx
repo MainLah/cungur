@@ -21,42 +21,35 @@ const DashboardPage = () => {
   const [userLink, setUserLink] = useState<string>("");
 
   useEffect(() => {
-    const fetchUsername = async () => {
-      try {
-        const res = await fetch(BASE_URL + "/api/auth/me", {
+    async function datas() {
+      const [fetchUsername, fetchData] = await Promise.all([
+        fetch(BASE_URL + "/api/auth/me", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUserLink(
-            `https://cungur.vercel.app/dashboard/${data.data.username}`
-          );
-          setIsLoadingLink(false);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-      }
-    };
-    fetchUsername();
+        }),
+        fetch(BASE_URL + "/api/messages", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }),
+      ]);
 
-    const getData = async () => {
-      try {
-        const data = await fetch(BASE_URL + "/api/messages", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        });
-        const messages = await data.json();
-        setMessages(messages.data);
-        console.log(messages);
-        setIsLoadingMessages(false);
-      } catch (error) {
-        setError(error as unknown as string);
-      }
-    };
-    getData();
+      const username = await fetchUsername.json();
+      setUserLink(
+        `https://cungur.vercel.app/dashboard/${username.data.username}`
+      );
+      setIsLoadingLink(false);
+
+      const data = await fetchData.json();
+      setMessages(data.data);
+      setIsLoadingMessages(false);
+    }
+    try {
+      datas();
+    } catch (e) {
+      setError((e as unknown as Error).message);
+    }
   }, [BASE_URL]);
 
   const handleCopy = () => {
