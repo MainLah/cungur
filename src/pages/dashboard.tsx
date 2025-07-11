@@ -45,8 +45,8 @@ const DashboardPage = () => {
         const data = await fetchData.json();
         setMessages(data.data);
         setIsLoadingMessages(false);
-      } catch (e) {
-        setError((e as unknown as Error).message);
+      } catch (err) {
+        setError((err as unknown as Error).message);
       }
     }
     datas();
