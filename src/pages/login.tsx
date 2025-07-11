@@ -23,34 +23,34 @@ const LoginPage = () => {
     },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    fetch(BASE_URL + "/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: data.username,
-        password: data.password,
-      }),
-      credentials: "include",
-    })
-      .then(async (res) => {
-        if (res.status === 403) {
-          setError(await res.json().then((e) => e.message));
-          return;
-        }
-        window.location.href = "/dashboard";
-      })
-      .catch((e) => {
-        console.error(e, "error");
-        setError("Invalid username or password");
+  const handleSubmit = form.handleSubmit(async (data) => {
+    try {
+      const res = await fetch(BASE_URL + "/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+        }),
+        credentials: "include",
       });
+      const loginData = await res.json();
+      if (res.status === 403) {
+        setError(loginData.message);
+        return;
+      }
+      setError("");
+      window.location.href = "/dashboard";
+    } catch (err) {
+      setError("Invalid username or password");
+    }
   });
 
   return (
     <div className="flex flex-col justify-center h-screen max-w-2xl mx-auto py-10 px-4">
-      {error ? (
+      {error && (
         <div className="text-red-500 text-center mb-4 text-2xl">{error}</div>
-      ) : null}
+      )}
       <div>
         <h1 className="text-3xl font-bold text-center mb-2">
           Welcome to Cungur App,

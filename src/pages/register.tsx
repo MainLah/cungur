@@ -24,34 +24,35 @@ const RegisterPage = () => {
     },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    fetch(BASE_URL + "/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        username: data.username,
-        password: data.password,
-        confirmPassword: data.confirmPassword,
-      }),
-    })
-      .then(async (res) => {
-        if (res.status === 403) {
-          setError(await res.json().then((e) => e.message));
-          return;
-        }
-        window.location.href = "/dashboard";
-      })
-      .catch((e) => {
-        console.error(e);
+  const handleSubmit = form.handleSubmit(async (data) => {
+    try {
+      const res = await fetch(BASE_URL + "/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+          confirmPassword: data.confirmPassword,
+        }),
       });
+      const registerData = await res.json();
+      if (!res.ok) {
+        setError(registerData.message);
+        return;
+      }
+      setError("");
+      window.location.href = "/dashboard";
+    } catch (err) {
+      setError((err as unknown as Error).message);
+    }
   });
 
   return (
     <div className="flex flex-col flex-auto justify-center h-screen max-w-2xl mx-auto py-10 px-4">
-      {error ? (
+      {error && (
         <div className="text-red-500 text-center mb-4 text-2xl">{error}</div>
-      ) : null}
+      )}
       <div>
         <h1 className="text-3xl font-bold text-center mb-2">
           Welcome to Cungur App,

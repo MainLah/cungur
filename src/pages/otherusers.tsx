@@ -13,6 +13,7 @@ const OtherUsersPage = () => {
   const { username } = useParams<{ username: string }>();
   const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,18 +22,16 @@ const OtherUsersPage = () => {
           `${BASE_URL}/api/messages/${username}`,
           { credentials: "include" }
         );
-        if (DBCurrentMessages.status === 403) {
+        if (!DBCurrentMessages.ok) {
           const errorData = await DBCurrentMessages.json();
           console.error("Error fetching messages:", errorData.message);
           navigate("/dashboard");
         }
-        if (DBCurrentMessages.ok) {
-          const data = await DBCurrentMessages.json();
-          setCurrentMessages(data.data);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
+        const data = await DBCurrentMessages.json();
+        setCurrentMessages(data.data);
+        setIsLoading(false);
+      } catch (err) {
+        setError((err as unknown as Error).message);
       }
     };
     fetchData();
@@ -50,19 +49,23 @@ const OtherUsersPage = () => {
           }),
           credentials: "include",
         });
-        if (res.ok) {
-          setCurrentMessages([
-            {
-              _id: await res.json().then((data) => data._id),
-              username: username ?? null,
-              message: newMessage,
-              timestamp: new Date(),
-            },
-            ...currentMessages,
-          ]);
+        const sendData = await res.json();
+        if (!res.ok) {
+          setError(sendData.message);
+          return;
         }
-      } catch (error) {
-        console.error("Failed to send message:", error);
+        setCurrentMessages([
+          {
+            _id: sendData.id,
+            username: username ?? null,
+            message: newMessage,
+            timestamp: new Date(),
+          },
+          ...currentMessages,
+        ]);
+        setError("");
+      } catch (err) {
+        setError((err as unknown as Error).message);
       }
       setNewMessage("");
     }
@@ -70,6 +73,11 @@ const OtherUsersPage = () => {
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
+      {error && (
+        <div className="text-red-500 text-center mb-4 text-xl md:text-2xl">
+          {error}
+        </div>
+      )}
       <Card>
         <CardHeader className="flex items-center justify-between">
           <CardTitle>Dashboard</CardTitle>

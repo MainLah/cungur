@@ -66,10 +66,11 @@ const DashboardPage = () => {
         credentials: "include",
         body: JSON.stringify({ _id: id }),
       });
-      console.log(id);
-      if (res.ok) {
-        setMessages(messages.filter((msg) => msg._id !== id));
+      if (!res.ok) {
+        setError(await res.json().then((json) => json.message));
       }
+      setMessages(messages.filter((msg) => msg._id !== id));
+      setError("");
     } catch (error) {
       setError(error as unknown as string);
     }
@@ -77,9 +78,9 @@ const DashboardPage = () => {
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
-      {error ? (
+      {error && (
         <div className="text-red-500 text-center mb-4 text-2xl">{error}</div>
-      ) : null}
+      )}
       <Card>
         <CardHeader className="flex items-center justify-between">
           <CardTitle>Your Inbox</CardTitle>
